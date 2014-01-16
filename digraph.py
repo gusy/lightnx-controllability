@@ -4,15 +4,18 @@ from sets import Set
 class DiGraph:
     nei = {}
     rev_nei = {}
+
     def is_directed(self):
         return True
+
     def add_node(self, node):
         self.nei[node] = Set([])
         self.rev_nei[node] = Set([])
 
-    def add_nodes(self,nodes):
+    def add_nodes(self, nodes):
         for node in nodes:
             self.add_node(node)
+
     def add_edge(self, source,  target):
         if source not in self.nei:
             self.add_node(source)
@@ -32,6 +35,7 @@ class DiGraph:
         if (node in self.nei) or (node in self.rev_nei):
             return True
         return False
+
     #NOT FAST, try to avoid
     def edges_iter(self):
         a = []
@@ -39,6 +43,7 @@ class DiGraph:
             for tgt in self.nei[src]:
                 a.append((src, tgt))
         return a.__iter__()
+
     #NOT FAST, try to avoid
     def edges(self):
         a = []
@@ -54,6 +59,7 @@ class DiGraph:
         neis = self.rev_nei.pop(node, [])
         for n in neis:
             self.nei[n].remove(node)
+
     def successors(self, node):
         if node in self.nei:
             return self.nei[node]
@@ -64,6 +70,7 @@ class DiGraph:
             if target in self.nei[node]:
                 return True
         return False
+
     def successors_iter(self, node):
         if node in self.nei:
             return self.nei[node].__iter__()
@@ -78,6 +85,7 @@ class DiGraph:
             if target in self.rev_nei[node]:
                 return True
         return False
+
     def predecesors_iter(self, node):
         if node in self.rev_nei:
             return self.rev_nei[node].__iter__()
