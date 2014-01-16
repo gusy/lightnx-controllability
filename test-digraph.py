@@ -42,13 +42,13 @@ class TesterDigraph:
         assert_equal(G.has_predecesor(1, 0), True)
         assert_equal(G.has_predecesor(0, -1), False)
 
-    def test_predecesors(self):
+    def test_predecessors(self):
         G = self.K3
-        assert_equal(sorted(list(G.predecesors(2))), [0, 1])
+        assert_equal(sorted(list(G.predecessors(2))), [0, 1])
 
-    def test_predecesors_iter(self):
+    def test_predecessors_iter(self):
         G = self.K3
-        assert_equal(sorted(G.predecesors_iter(2)), [0, 1])
+        assert_equal(sorted(G.predecessors_iter(2)), [0, 1])
 
     def test_add_remove_node(self):
         G=lightnx.DiGraph()
@@ -101,9 +101,15 @@ class TesterDigraph:
         assert_equal(sorted(G.neighbors('A')),['B', 'C'])
         assert_equal(sorted(G.neighbors('G')),[])
 
-    def read_from_nx(self)
-        import networkx
-
+    def test_read_from_nx(self):
+        import networkx as nx
+        gnx = nx.DiGraph(nx.scale_free_graph(1000))
+        glnx = lightnx.DiGraph()
+        glnx.add_edges(gnx.edges())
+        assert_equals(set(glnx.edges()), set(gnx.edges()))
+        assert_equals(set(glnx.successors(786)), set(gnx.successors(786)))
+        assert_equals(set(glnx.successors(0)), set(gnx.successors(0)))
+        assert_equals(set(glnx.predecessors(678)), set(gnx.predecessors(678)))
 
 
 

@@ -1,10 +1,11 @@
 from sets import Set
 
 
-class DiGraph:
-    nei = {}
-    rev_nei = {}
-
+class DiGraph(object):
+    def __init__(self):
+        self.nei = {}
+        self.rev_nei = {}
+        return
     def is_directed(self):
         return True
 
@@ -75,7 +76,7 @@ class DiGraph:
         if node in self.nei:
             return self.nei[node].__iter__()
 
-    def predecesors(self, node):
+    def predecessors(self, node):
         if node in self.rev_nei:
             return self.rev_nei[node]
         return set([])
@@ -86,12 +87,12 @@ class DiGraph:
                 return True
         return False
 
-    def predecesors_iter(self, node):
+    def predecessors_iter(self, node):
         if node in self.rev_nei:
             return self.rev_nei[node].__iter__()
 
     def neighbors(self, node):
-        return self.predecesors(node).union(self.successors(node))
+        return self.predecessors(node).union(self.successors(node))
 
     def has_edge(self, source, target):
         return self.has_successor(source, target)
@@ -102,6 +103,7 @@ class DiGraph:
         if target in self.rev_nei:
             self.rev_nei[target].remove(source)
 
+
 if __name__ == "__main__":
     d = DiGraph()
     d.add_node("hola")
@@ -110,7 +112,7 @@ if __name__ == "__main__":
     print d.nei
     print d.rev_nei
     print d.nodes()
-    print "neighbors of q :", d.predecesors("q"), d.successors("q")
+    print "neighbors of q :", d.predecessors("q"), d.successors("q")
     print d.edges()
     d.del_node("adios")
     print d.nodes(), d.edges()
