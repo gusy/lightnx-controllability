@@ -2,6 +2,8 @@ import digraph as lightnx
 from nose.tools import *
 import matchings
 
+#Epiloaded=False
+#Gepi=None
 
 class TesterDigraph:
     def __init__(self):
@@ -25,6 +27,21 @@ class TesterDigraph:
         #self.K5=cnlti(nx.complete_graph(5), first_label=1)
         #self.K10=cnlti(nx.complete_graph(10), first_label=1)
         #self.G=nx.Graph
+    #    if not Epiloaded:
+            #import urllib,gzip,StringIO
+            #compr = StringIO.StringIO()
+            #compr.write(urllib.urlopen(
+            #"http://snap.stanford.edu/data/soc-Epinions1.txt.gz").read())
+            #compr.seek(0)
+            #dcom = gzip.GzipFile(fileobj=compr, mode='rb')
+            #self.Gepi = lightnx.DiGraph()
+            #for line in dcom:
+                #if line[0]=="#":
+                    #continue
+                #nodes = map(int,line.split("\t"))
+                #self.Gepi.add_edge(nodes[0],nodes[1])
+            #Epiloaded=True
+            #self.Gepi = Gepi
 
     def isMatching(self,edges):
         origins=set([])
@@ -42,7 +59,7 @@ class TesterDigraph:
         G = self.K3
         bip = matchings.getBipartite(G)
         print bip
-        assert_equal(bip['0+'], set(['1-','2-']))
+        assert_equal(sorted(bip['0+']), sorted(['1-','2-']))
 
     def test_matching(self):
         G = lightnx.DiGraph()
@@ -66,3 +83,64 @@ class TesterDigraph:
         assert_equal(self.isMatching(matching),True)
         assert_equal(2,len(matching))
         assert_equal(sorted(matching),sorted([('2','2'),('1','1')]))
+
+#    def no_test_epinions(self):
+        #import urllib,gzip,StringIO
+        #compr = StringIO.StringIO()
+        #compr.write(urllib.urlopen(
+        #"http://snap.stanford.edu/data/soc-Epinions1.txt.gz").read())
+        #compr.seek(0)
+        #dcom = gzip.GzipFile(fileobj=compr, mode='rb')
+        #G = lightnx.DiGraph()
+        #for line in dcom:
+            #if line[0]=="#":
+                #continue
+            #nodes = map(int,line.split("\t"))
+            #G.add_edge(nodes[0],nodes[1])
+        #assert_equal(len(G.nodes()),75879) #http://www4.ncsu.edu/~qge2/Files/[2a]Controllability%20of%20complex%20networks.pdf
+        #matching = matchings.matching(G)
+        #assert_equal(self.isMatching(matching),True)
+        #assert_equal(len(G.nodes())-41627,len(matching))
+    def test_scc(self):
+        G = self.K3
+        sccs = matchings.strongly_connected_components(G)
+        assert_equal(len(sccs),3)
+    def test_non_top(self):
+        G = lightnx.DiGraph()
+        G.add_edges([(1,2),(2,1),(2,3),(3,4),(4,3),(5,4),(5,6),(6,5),(7,6)])
+        sccs = matchings.strongly_connected_components(G)
+        for scc in sccs:
+            if matchings.is_non_top_linked(G,scc):
+                assert_equal(sorted(scc) in [[1,2],[7]],True)
+    def test_control_set(self):
+        G = lightnx.DiGraph()
+        G.add_edges([(1,2),(2,1),(2,3),(3,4),(4,3),(5,4),(5,6),(6,5),(7,6)])
+        drivers = matchings.controller_set(G)
+        assert_equal(set(['1','7']),drivers)
+
+    def test_controllers_dilation(self):
+        G = lightnx.DiGraph()
+        G.add_edges([(1,2),(2,1),(2,3),(3,4),(4,3),(5,4),(5,6),(6,5),(7,6)])
+        mm=matchings.matching(G)
+        contr = matchings.controllers_dilation(mm,G.nodes())
+        assert_equal(contr,set(['7']))
+
+    def test_control_set_epinions(self):
+        import urllib,gzip,StringIO
+        compr = StringIO.StringIO()
+        compr.write(urllib.urlopen(
+        "http://snap.stanford.edu/data/soc-Epinions1.txt.gz").read())
+        compr.seek(0)
+        dcom = gzip.GzipFile(fileobj=compr, mode='rb')
+        G = lightnx.DiGraph()
+        for line in dcom:
+            if line[0]=="#":
+                continue
+            nodes = map(int,line.split("\t"))
+            G.add_edge(nodes[0],nodes[1])
+        assert_equal(len(G.nodes()),75879) #http://www4.ncsu.edu/~qge2/Files/[2a]Controllability%20of%20complex%20networks.pdf
+        mm=matchings.matching(G)
+        contr = matchings.controller_set(G)
+        assert_equal(len(contr)>=41627,True)
+
+
