@@ -143,4 +143,3 @@ class TesterDigraph:
         contr = matchings.controller_set(G)
         assert_equal(len(contr)>=41627,True)
 
-
