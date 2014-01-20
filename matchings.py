@@ -242,7 +242,7 @@ class SCC():
             return True
         return False
 
-def get_pm_nt_scc(G):
+def get_pm_nt_scc_and_Gprime(G):
     '''returns a list set of perfect matchable non top-linked strongly connected components of a graph
         returned objects of class "scc"
     '''
@@ -266,14 +266,15 @@ def get_pm_nt_scc(G):
                                 #perfect_matchable_nt2[-1]["outlinks"][node]=Set([])
                             #perfect_matchable_nt2[-1]["outlinks"][node].add(outlink)
 #                perfect_matchable_nt.append(scc)
-    return perfect_matchable_nt
-
-def optimal_set(G):
     Gprime=G.subgraph(nodesOnGPrime)
-    mmGprime=matching(Gprime)
-    mmGprimeSize=len(mmGprime)
-    print Gprime.nei,Gprime.rev_nei
-    print mmGprimeSize
-    print perfect_matchable_nt
-    print perfect_matchable_nt2
+    return perfect_matchable_nt, Gprime
+
+#def optimal_set(G):
+    #Gprime=G.subgraph(nodesOnGPrime)
+    #mmGprime=matching(Gprime)
+    #mmGprimeSize=len(mmGprime)
+    #print Gprime.nei,Gprime.rev_nei
+    #print mmGprimeSize
+    #print perfect_matchable_nt
+    #print perfect_matchable_nt2
 
