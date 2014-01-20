@@ -231,14 +231,21 @@ def controller_set(G):
     return cont
 #def isAssignable(G,scc):
 
-class scc(DiGraph):
-    def __init__(subgraph):
-        self.nei = subgraph.nei
-        self.rev_nei = subgraph.rev_nei
+class SCC():
+    def __init__(self,subgraph):
+        self.graph = subgraph #either a networkX.DiGraph or a lightnx.DiGraph
         self.outnodes = set([])
         self.outlinks = []
 
-def optimal_controller_set(G):
+    def __contains__(self, node):
+        if self.graph.has_node(node):
+            return True
+        return False
+
+def get_pm_nt_scc(G):
+    '''returns a list set of perfect matchable non top-linked strongly connected components of a graph
+        returned objects of class "scc"
+    '''
     sccs=strongly_connected_components(G)
     #non_top_linked=[]
     perfect_matchable_nt=[]
@@ -246,17 +253,22 @@ def optimal_controller_set(G):
     for scc in sccs:
         if is_non_top_linked(G,scc):
             #non_top_linked.append(scc)
-            sccnt = scc(G.subgraph(scc))
-            if is_perfect_matchable(G,sccnt):
+            sccnt = SCC(G.subgraph(scc))
+            if is_perfect_matchable(sccnt.graph):
                 for node in scc:
                     nodesOnGPrime.remove(node)
-                    for outlink in G.nei[node]:
-                        if outlink not in scc:
-                            if node not in perfect_matchable_nt2[-1]["outlinks"]:
-                                perfect_matchable_nt2[-1]["outlinks"][node]=Set([])
-                            perfect_matchable_nt2[-1]["outlinks"][node].add(outlink)
-                perfect_matchable_nt.append(scc)
+                    for outnode in G.successors(node): # NOT USING NEI!!! is not nx compliant
+                        if outnode not in sccnt: ##use the __contains in class scc)
+                            sccnt.outnodes.add(outnode)
+                            sccnt.outlinks.append((node, outnode))
+                perfect_matchable_nt.append(sccnt)
+#                            if node not in perfect_matchable_nt2[-1]["outlinks"]:
+                                #perfect_matchable_nt2[-1]["outlinks"][node]=Set([])
+                            #perfect_matchable_nt2[-1]["outlinks"][node].add(outlink)
+#                perfect_matchable_nt.append(scc)
+    return perfect_matchable_nt
 
+def optimal_set(G):
     Gprime=G.subgraph(nodesOnGPrime)
     mmGprime=matching(Gprime)
     mmGprimeSize=len(mmGprime)

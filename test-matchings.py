@@ -150,11 +150,23 @@ class TesterDigraph:
 
 
 
-#    def test_optimal_controller_set(self):
-        #G= lightnx.DiGraph()
-        #G.add_edges([(1,2),(2,1),(2,3),(3,4),(4,3),(5,4),(5,6),(6,5),(7,6),(7,7),(7,5)])
-        #matchings.optimal_controller_set(G)
-        #assert_equals(1,2)
+    def test_get_pm_nt_scc(self):
+        G= lightnx.DiGraph()
+        G.add_edges([(1,2),(2,1),(2,3),(3,4),(4,3),(5,4),(5,6),(6,5),(7,6),(7,7),(7,5)])
+        scc_pm_nt = matchings.get_pm_nt_scc(G)
+        assert_equals(len(scc_pm_nt),2)
+        def check_results(scc_pm_nt):
+            assert_equals(set(scc_pm_nt[0].graph.nodes()),set([1,2]))
+            assert_equals(set(scc_pm_nt[1].graph.nodes()),set([7]))
+            assert_equals(scc_pm_nt[0].outnodes,set([3]))
+            assert_equals(set(scc_pm_nt[0].outlinks),set([(2,3)]))
+            assert_equals(scc_pm_nt[1].outnodes,set([6,5]))
+            assert_equals(set(scc_pm_nt[1].outlinks),set([(7,6),(7,5)]))
+
+        if len(scc_pm_nt[0].graph.nodes())==2:
+            check_results(scc_pm_nt)
+        else:
+            check_results(scc_pm_nt[1:0])
 
 
 
