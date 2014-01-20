@@ -1,4 +1,4 @@
-import digraph as lightnx
+import networkx as lightnx
 from nose.tools import *
 import matchings
 
