@@ -117,6 +117,24 @@ class TesterDigraph:
         G.add_edges([(1,2),(2,1),(2,3),(3,4),(4,3),(5,4),(5,6),(6,5),(7,6)])
         drivers = matchings.controller_set(G)
         assert_equal(set(['1','7']),drivers)
+    def test_is_perfect_matchable(self):
+        G = lightnx.DiGraph()
+        G.add_edges([(1,2),(2,1),(2,3),(3,2)])
+        sccs=matchings.strongly_connected_components(G)
+        is_p_m=matchings.is_perfect_matchable(G,sccs[0])
+        assert_equal(is_p_m,False)
+        G= lightnx.DiGraph()
+        G.add_edges([(1,2),(2,1),(2,3),(3,4),(4,3),(5,4),(5,6),(6,5)])
+        sccs=matchings.strongly_connected_components(G)
+        for scc in sccs:
+            is_p_m=matchings.is_perfect_matchable(G,scc)
+            assert_equal(is_p_m,True)
+
+    def test_optimal_controller_set(self):
+        G= lightnx.DiGraph()
+        G.add_edges([(1,2),(2,1),(2,3),(3,4),(4,3),(5,4),(5,6),(6,5),(7,6),(7,7),(7,5)])
+        matchings.optimal_controller_set(G)
+        assert_equals(1,2)
 
     def test_controllers_dilation(self):
         G = lightnx.DiGraph()
@@ -125,21 +143,21 @@ class TesterDigraph:
         contr = matchings.controllers_dilation(mm,G.nodes())
         assert_equal(contr,set(['7']))
 
-    def test_control_set_epinions(self):
-        import urllib,gzip,StringIO
-        compr = StringIO.StringIO()
-        compr.write(urllib.urlopen(
-        "http://snap.stanford.edu/data/soc-Epinions1.txt.gz").read())
-        compr.seek(0)
-        dcom = gzip.GzipFile(fileobj=compr, mode='rb')
-        G = lightnx.DiGraph()
-        for line in dcom:
-            if line[0]=="#":
-                continue
-            nodes = map(int,line.split("\t"))
-            G.add_edge(nodes[0],nodes[1])
-        assert_equal(len(G.nodes()),75879) #http://www4.ncsu.edu/~qge2/Files/[2a]Controllability%20of%20complex%20networks.pdf
-        mm=matchings.matching(G)
-        contr = matchings.controller_set(G)
-        assert_equal(len(contr)>=41627,True)
+    #def test_control_set_epinions(self):
+        #import urllib,gzip,StringIO
+        #compr = StringIO.StringIO()
+        #compr.write(urllib.urlopen(
+        #"http://snap.stanford.edu/data/soc-Epinions1.txt.gz").read())
+        #compr.seek(0)
+        #dcom = gzip.GzipFile(fileobj=compr, mode='rb')
+        #G = lightnx.DiGraph()
+        #for line in dcom:
+            #if line[0]=="#":
+                #continue
+            #nodes = map(int,line.split("\t"))
+            #G.add_edge(nodes[0],nodes[1])
+        #assert_equal(len(G.nodes()),75879) #http://www4.ncsu.edu/~qge2/Files/[2a]Controllability%20of%20complex%20networks.pdf
+        #mm=matchings.matching(G)
+        #contr = matchings.controller_set(G)
+        #assert_equal(len(contr)>=41627,True)
 

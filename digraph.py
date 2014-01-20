@@ -103,6 +103,116 @@ class DiGraph(object):
         if target in self.rev_nei:
             self.rev_nei[target].remove(source)
 
+    def subgraph(self, nbunch):
+        """Return the subgraph induced on nodes in nbunch.
+
+        The induced subgraph of the graph contains the nodes in nbunch
+        and the edges between those nodes.
+
+        Parameters
+        ----------
+        nbunch : list, iterable
+        A container of nodes which will be iterated through once.
+
+        Returns
+        -------
+        G : Graph
+        A subgraph of the graph with the same edge attributes.
+
+        Notes
+        -----
+        The graph, edge or node attributes just point to the original graph.
+        So changes to the node or edge structure will not be reflected in
+        the original graph while changes to the attributes will.
+
+        To create a subgraph with its own copy of the edge/node attributes use:
+        nx.Graph(G.subgraph(nbunch))
+
+        If edge attributes are containers, a deep copy can be obtained using:
+        G.subgraph(nbunch).copy()
+
+        For an inplace reduction of a graph to a subgraph you can remove nodes:
+        G.remove_nodes_from([ n in G if n not in set(nbunch)])
+
+        Examples
+        --------
+        >>> G = nx.Graph() # or DiGraph, MultiGraph, MultiDiGraph, etc
+        >>> G.add_path([0,1,2,3])
+        >>> H = G.subgraph([0,1,2])
+        >>> H.edges()
+        [(0, 1), (1, 2)]
+        """
+        bunch =nbunch# self.nbunch_iter(nbunch)
+        # create new graph and copy subgraph into it
+        H = self.__class__()
+        # copy node and attribute dictionaries
+        for n in bunch:
+           # print n
+            H.nei[n] = Set([])
+            for n_i in self.nei[n]:
+                if n_i in bunch:
+                    if n_i not in H.rev_nei:
+                        H.rev_nei[n_i] = Set([])
+                    H.nei[n].add(n_i)
+                    H.rev_nei[n_i] = Set([])
+                    H.rev_nei[n_i].add(n)
+        return H
+
+    def nbunch_iter(self, nbunch=None):
+        """Return an iterator of nodes contained in nbunch that are
+        also in the graph.
+
+        The nodes in nbunch are checked for membership in the graph
+        and if not are silently ignored.
+
+        Parameters
+        ----------
+        nbunch : iterable container, optional (default=all nodes)
+        A container of nodes. The container will be iterated
+        through once.
+
+        Returns
+        -------
+        niter : iterator
+        An iterator over nodes in nbunch that are also in the graph.
+        If nbunch is None, iterate over all nodes in the graph.
+
+        Raises
+        ------
+        NetworkXError
+        If nbunch is not a node or or sequence of nodes.
+        If a node in nbunch is not hashable.
+
+        See Also
+        --------
+        Graph.__iter__
+
+        Notes
+        -----
+        When nbunch is an iterator, the returned iterator yields values
+        directly from nbunch, becoming exhausted when nbunch is exhausted.
+
+        To test whether nbunch is a single node, one can use
+        "if nbunch in self:", even after processing with this routine.
+
+        If nbunch is not a node or a (possibly empty) sequence/iterator
+        or None, a NetworkXError is raised. Also, if any object in
+        nbunch is not hashable, a NetworkXError is raised.
+        """
+        if nbunch is None: # include all nodes via iterator
+            bunch = iter(self.nodes())
+        elif not hasattr(nbunch, '__iter__'):
+            if ((nbunch in self.nei) or (nbunch in self.rev_nei)): # if nbunch is a single node
+                bunch = iter([nbunch])
+            else:
+                bunch = iter([])
+        else: # if nbunch is a sequence of nodes
+            def bunch_iter(nlist,adj):
+                for n in nlist:
+                    if n in adj:
+                        yield n
+            bunch = bunch_iter(nbunch,Set(self.nei.keys() + self.rev_nei.keys()))
+        return bunch
 
 if __name__ == "__main__":
     d = DiGraph()

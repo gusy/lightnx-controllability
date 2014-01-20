@@ -1,7 +1,7 @@
 from digraph import DiGraph
 import collections
 import random
-
+from sets import Set
 
 INFINITY = -1
 
@@ -204,6 +204,14 @@ def controllers_dilation(matching,nodes):
         if edge[1] in controllers:
             controllers.remove(edge[1])
     return controllers
+def is_perfect_matchable(G, scc):
+    is_perfect_matchable=False
+    sccGraph=G.subgraph(scc)
+    sccSize=len(sccGraph.nodes())
+    sccMatch=matching(sccGraph)
+    if len(sccMatch)==sccSize:
+        is_perfect_matchable=True
+    return is_perfect_matchable
 
 def controller_set(G):
     sccs = strongly_connected_components(G)
@@ -222,5 +230,32 @@ def controller_set(G):
             if not scc_controlled:
                 cont.add(str(scc[0]))
     return cont
+#def isAssignable(G,scc):
+def optimal_controller_set(G):
+    sccs=strongly_connected_components(G)
+    #non_top_linked=[]
+    perfect_matchable_nt=[]
+    perfect_matchable_nt2=[]
+    nodesOnGPrime=Set(G.nodes())
+    for scc in sccs:
+        if is_non_top_linked(G,scc):
+            #non_top_linked.append(scc)
+            if is_perfect_matchable(G,scc):
+                perfect_matchable_nt.append(scc)
+                perfect_matchable_nt2.append({"nodes":scc,"outlinks":{}})
+                for node in scc:
+                    nodesOnGPrime.remove(node)
+                    for outlink in G.nei[node]:
+                        if outlink not in scc:
+                            if node not in perfect_matchable_nt2[-1]["outlinks"]:
+                                perfect_matchable_nt2[-1]["outlinks"][node]=Set([])
+                            perfect_matchable_nt2[-1]["outlinks"][node].add(outlink)
 
+    Gprime=G.subgraph(nodesOnGPrime)
+    mmGprime=matching(Gprime)
+    mmGprimeSize=len(mmGprime)
+    print Gprime.nei,Gprime.rev_nei
+    print mmGprimeSize
+    print perfect_matchable_nt
+    print perfect_matchable_nt2
 

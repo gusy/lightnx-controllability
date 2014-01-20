@@ -110,6 +110,17 @@ class TesterDigraph:
         assert_equals(set(glnx.successors(786)), set(gnx.successors(786)))
         assert_equals(set(glnx.successors(0)), set(gnx.successors(0)))
         assert_equals(set(glnx.predecessors(678)), set(gnx.predecessors(678)))
+    def test_subgraph(self):
+        G=self.K3
+        subG=G.subgraph([1,2])
+        print subG.nei, subG.rev_nei
+        assert_equals(2,2)
+    def test_nbunch_iter(self):
+        G=self.K3
+        assert_equals([i for i in G.nbunch_iter(1)],[1])
+        assert_equals([i for i in G.nbunch_iter([1])],[1])
+        assert_equals([i for i in G.nbunch_iter([1,'C'])],[1])
+        assert_equals([i for i in G.nbunch_iter('C')],[])
 
 
 
