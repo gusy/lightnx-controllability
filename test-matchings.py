@@ -22,7 +22,7 @@ class TesterDigraph:
         #self.P10=cnlti(nx.path_graph(10), first_label=1)
         #self.K1=cnlti(nx.complete_graph(1), first_label=1)
         self.K3 = lightnx.DiGraph()
-        self.K3.add_edges([(0, 1), (1, 2), (0, 2)])
+        self.K3.add_edges_from([(0, 1), (1, 2), (0, 2)])
         #self.K4=cnlti(nx.complete_graph(4), first_label=1)
         #self.K5=cnlti(nx.complete_graph(5), first_label=1)
         #self.K10=cnlti(nx.complete_graph(10), first_label=1)
@@ -63,14 +63,14 @@ class TesterDigraph:
 
     def test_matching(self):
         G = lightnx.DiGraph()
-        G.add_edges([(1, 2), (2, 3), (3, 1), (1, 4), (1, 5), (1, 6)])
+        G.add_edges_from([(1, 2), (2, 3), (3, 1), (1, 4), (1, 5), (1, 6)])
         matching = matchings.matching(G)
         assert_equal(self.isMatching(matching),True)
         assert_equal(3,len(matching))
 
     def test_matchings2(self):
         G = lightnx.DiGraph()
-        G.add_edges([(1, 2), (2, 1), (2, 3), (3, 4), (4, 5), (5, 3), (5, 6)])
+        G.add_edges_from([(1, 2), (2, 1), (2, 3), (3, 4), (4, 5), (5, 3), (5, 6)])
         G.add_node(7)
         matching = matchings.matching(G)
         assert_equal(self.isMatching(matching),True)
@@ -78,7 +78,7 @@ class TesterDigraph:
 
     def test_matching_self_loop(self):
         G = lightnx.DiGraph()
-        G.add_edges([(1, 1), (1, 2), (2, 2)])
+        G.add_edges_from([(1, 1), (1, 2), (2, 2)])
         matching = matchings.matching(G)
         assert_equal(self.isMatching(matching),True)
         assert_equal(2,len(matching))
@@ -107,24 +107,24 @@ class TesterDigraph:
         assert_equal(len(sccs),3)
     def test_non_top(self):
         G = lightnx.DiGraph()
-        G.add_edges([(1,2),(2,1),(2,3),(3,4),(4,3),(5,4),(5,6),(6,5),(7,6)])
+        G.add_edges_from([(1,2),(2,1),(2,3),(3,4),(4,3),(5,4),(5,6),(6,5),(7,6)])
         sccs = matchings.strongly_connected_components(G)
         for scc in sccs:
             if matchings.is_non_top_linked(G,scc):
                 assert_equal(sorted(scc) in [[1,2],[7]],True)
     def test_control_set(self):
         G = lightnx.DiGraph()
-        G.add_edges([(1,2),(2,1),(2,3),(3,4),(4,3),(5,4),(5,6),(6,5),(7,6)])
+        G.add_edges_from([(1,2),(2,1),(2,3),(3,4),(4,3),(5,4),(5,6),(6,5),(7,6)])
         drivers = matchings.controller_set(G)
         assert_equal(set(['1','7']),drivers)
     def test_is_perfect_matchable(self):
         G = lightnx.DiGraph()
-        G.add_edges([(1,2),(2,1),(2,3),(3,2)])
+        G.add_edges_from([(1,2),(2,1),(2,3),(3,2)])
         sccs=matchings.strongly_connected_components(G)
         is_p_m=matchings.is_perfect_matchable(G,sccs[0])
         assert_equal(is_p_m,False)
         G= lightnx.DiGraph()
-        G.add_edges([(1,2),(2,1),(2,3),(3,4),(4,3),(5,4),(5,6),(6,5)])
+        G.add_edges_from([(1,2),(2,1),(2,3),(3,4),(4,3),(5,4),(5,6),(6,5)])
         sccs=matchings.strongly_connected_components(G)
         for scc in sccs:
             is_p_m=matchings.is_perfect_matchable(G,scc)
@@ -132,18 +132,18 @@ class TesterDigraph:
 
     def test_controllers_dilation(self):
         G = lightnx.DiGraph()
-        G.add_edges([(1,2),(2,1),(2,3),(3,4),(4,3),(5,4),(5,6),(6,5),(7,6)])
+        G.add_edges_from([(1,2),(2,1),(2,3),(3,4),(4,3),(5,4),(5,6),(6,5),(7,6)])
         mm=matchings.matching(G)
         contr = matchings.controllers_dilation(mm,G.nodes())
         assert_equal(contr,set(['7']))
 
     def test_is_perfect_matchable(self):
         G1=lightnx.DiGraph()
-        G1.add_edges([('A','B'),('B','A')])
+        G1.add_edges_from([('A','B'),('B','A')])
         G2=lightnx.DiGraph()
-        G2.add_edges([('A','B'),('B','A'),('A','C')])
+        G2.add_edges_from([('A','B'),('B','A'),('A','C')])
         G3=lightnx.DiGraph()
-        G3.add_edges([('C','C')])
+        G3.add_edges_from([('C','C')])
         assert_equal(matchings.is_perfect_matchable(G1),True)
         assert_equal(matchings.is_perfect_matchable(G2),False)
         assert_equal(matchings.is_perfect_matchable(G3),True)
@@ -152,7 +152,7 @@ class TesterDigraph:
 
     def test_get_pm_nt_scc(self):
         G= lightnx.DiGraph()
-        G.add_edges([(1,2),(2,1),(2,3),(3,4),(4,3),(5,4),(5,6),(6,5),(7,6),(7,7),(7,5)])
+        G.add_edges_from([(1,2),(2,1),(2,3),(3,4),(4,3),(5,4),(5,6),(6,5),(7,6),(7,7),(7,5)])
         scc_pm_nt,gprime = matchings.get_pm_nt_scc_and_Gprime(G)
         assert_equals(len(scc_pm_nt),2)
         def check_results(scc_pm_nt):

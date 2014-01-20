@@ -18,7 +18,7 @@ class TesterDigraph:
         #self.P10=cnlti(nx.path_graph(10),first_label=1)
         #self.K1=cnlti(nx.complete_graph(1),first_label=1)
         self.K3 = lightnx.DiGraph()
-        self.K3.add_edges([(0, 1),(1, 2), (0, 2)])
+        self.K3.add_edges_from([(0, 1),(1, 2), (0, 2)])
         #self.K4=cnlti(nx.complete_graph(4),first_label=1)
         #self.K5=cnlti(nx.complete_graph(5),first_label=1)
         #self.K10=cnlti(nx.complete_graph(10),first_label=1)
@@ -95,7 +95,7 @@ class TesterDigraph:
 
     def test_neighbors(self):
         G=lightnx.DiGraph()
-        G.add_edges([('A', 'B'), ('A', 'C'), ('B', 'D'),
+        G.add_edges_from([('A', 'B'), ('A', 'C'), ('B', 'D'),
                           ('C', 'B'), ('C', 'D')])
         G.add_nodes('GJK')
         assert_equal(sorted(G.neighbors('A')),['B', 'C'])
@@ -105,7 +105,7 @@ class TesterDigraph:
         import networkx as nx
         gnx = nx.DiGraph(nx.scale_free_graph(1000))
         glnx = lightnx.DiGraph()
-        glnx.add_edges(gnx.edges())
+        glnx.add_edges_from(gnx.edges())
         assert_equals(set(glnx.edges()), set(gnx.edges()))
         assert_equals(set(glnx.successors(786)), set(gnx.successors(786)))
         assert_equals(set(glnx.successors(0)), set(gnx.successors(0)))
@@ -113,7 +113,7 @@ class TesterDigraph:
 
     def test_subgraph(self):
         G=lightnx.DiGraph()
-        G.add_edges([('A', 'B'), ('A', 'C'), ('B', 'D'),
+        G.add_edges_from([('A', 'B'), ('A', 'C'), ('B', 'D'),
                           ('C', 'B'), ('C', 'D')])
         SG=G.subgraph(['A','B','D'])
         assert_equal(sorted(SG.nodes()),sorted(['A', 'B', 'D']))

@@ -25,10 +25,9 @@ class DiGraph(object):
         self.nei[source].add(target)
         self.rev_nei[target].add(source)
 
-    def add_edges(self, t):
+    def add_edges_from(self, t):
         for tup in t:
             self.add_edge(tup[0], tup[1])
-
     def nodes(self):
         return list(Set(self.nei.keys() + self.rev_nei.keys()))
 
@@ -218,7 +217,7 @@ if __name__ == "__main__":
     d = DiGraph()
     d.add_node("hola")
     d.add_edge("hola", "adios")
-    d.add_edges([("p", "q"), ("q", "r")])
+    d.add_edges_from([("p", "q"), ("q", "r")])
     print d.nei
     print d.rev_nei
     print d.nodes()
