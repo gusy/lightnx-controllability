@@ -242,10 +242,11 @@ class SCC():
             return True
         return False
 
-def get_pm_nt_scc_and_Gprime(G):
+def get_S_nt_rm_Gprime(G):
     '''returns a list set of perfect matchable non top-linked strongly connected components of a graph
         returned objects of class "scc"
         returns also a subgraph o G' (the rest of the graph except for the S_nt_ru)
+        Steps 1 and 2 in the paper
     '''
     sccs=strongly_connected_components(G)
     #non_top_linked=[]
@@ -259,14 +260,10 @@ def get_pm_nt_scc_and_Gprime(G):
                 for node in scc:
                     nodesOnGPrime.remove(node)
                     for outnode in G.successors(node): # NOT USING NEI!!! is not nx compliant
-                        if outnode not in sccnt: ##use the __contains in class scc)
+                        if outnode not in sccnt:
                             sccnt.outnodes.add(outnode)
                             sccnt.outlinks.append((node, outnode))
                 perfect_matchable_nt.append(sccnt)
-#                            if node not in perfect_matchable_nt2[-1]["outlinks"]:
-                                #perfect_matchable_nt2[-1]["outlinks"][node]=Set([])
-                            #perfect_matchable_nt2[-1]["outlinks"][node].add(outlink)
-#                perfect_matchable_nt.append(scc)
     Gprime=G.subgraph(nodesOnGPrime)
     return perfect_matchable_nt, Gprime
 

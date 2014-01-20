@@ -150,10 +150,10 @@ class TesterDigraph:
 
 
 
-    def test_get_pm_nt_scc(self):
+    def test_get_S_nt_rm_Gprime(self):
         G= lightnx.DiGraph()
         G.add_edges_from([(1,2),(2,1),(2,3),(3,4),(4,3),(5,4),(5,6),(6,5),(7,6),(7,7),(7,5)])
-        scc_pm_nt,gprime = matchings.get_pm_nt_scc_and_Gprime(G)
+        scc_pm_nt,gprime = matchings.get_S_nt_rm_Gprime(G)
         assert_equals(len(scc_pm_nt),2)
         def check_results(scc_pm_nt):
             assert_equals(set(scc_pm_nt[0].graph.nodes()),set([1,2]))
