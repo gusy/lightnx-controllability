@@ -204,11 +204,10 @@ def controllers_dilation(matching,nodes):
         if edge[1] in controllers:
             controllers.remove(edge[1])
     return controllers
-def is_perfect_matchable(G, scc):
-    is_perfect_matchable=False
-    sccGraph=G.subgraph(scc)
+def is_perfect_matchable(sccGraph):
     sccSize=len(sccGraph.nodes())
     sccMatch=matching(sccGraph)
+    is_perfect_matchable = False
     if len(sccMatch)==sccSize:
         is_perfect_matchable=True
     return is_perfect_matchable
@@ -231,18 +230,24 @@ def controller_set(G):
                 cont.add(str(scc[0]))
     return cont
 #def isAssignable(G,scc):
+
+class scc(DiGraph):
+    def __init__(subgraph):
+        self.nei = subgraph.nei
+        self.rev_nei = subgraph.rev_nei
+        self.outnodes = set([])
+        self.outlinks = []
+
 def optimal_controller_set(G):
     sccs=strongly_connected_components(G)
     #non_top_linked=[]
     perfect_matchable_nt=[]
-    perfect_matchable_nt2=[]
     nodesOnGPrime=Set(G.nodes())
     for scc in sccs:
         if is_non_top_linked(G,scc):
             #non_top_linked.append(scc)
-            if is_perfect_matchable(G,scc):
-                perfect_matchable_nt.append(scc)
-                perfect_matchable_nt2.append({"nodes":scc,"outlinks":{}})
+            sccnt = scc(G.subgraph(scc))
+            if is_perfect_matchable(G,sccnt):
                 for node in scc:
                     nodesOnGPrime.remove(node)
                     for outlink in G.nei[node]:
@@ -250,6 +255,7 @@ def optimal_controller_set(G):
                             if node not in perfect_matchable_nt2[-1]["outlinks"]:
                                 perfect_matchable_nt2[-1]["outlinks"][node]=Set([])
                             perfect_matchable_nt2[-1]["outlinks"][node].add(outlink)
+                perfect_matchable_nt.append(scc)
 
     Gprime=G.subgraph(nodesOnGPrime)
     mmGprime=matching(Gprime)

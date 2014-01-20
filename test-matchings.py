@@ -130,18 +130,33 @@ class TesterDigraph:
             is_p_m=matchings.is_perfect_matchable(G,scc)
             assert_equal(is_p_m,True)
 
-    def test_optimal_controller_set(self):
-        G= lightnx.DiGraph()
-        G.add_edges([(1,2),(2,1),(2,3),(3,4),(4,3),(5,4),(5,6),(6,5),(7,6),(7,7),(7,5)])
-        matchings.optimal_controller_set(G)
-        assert_equals(1,2)
-
     def test_controllers_dilation(self):
         G = lightnx.DiGraph()
         G.add_edges([(1,2),(2,1),(2,3),(3,4),(4,3),(5,4),(5,6),(6,5),(7,6)])
         mm=matchings.matching(G)
         contr = matchings.controllers_dilation(mm,G.nodes())
         assert_equal(contr,set(['7']))
+
+    def test_is_perfect_matchable(self):
+        G1=lightnx.DiGraph()
+        G1.add_edges([('A','B'),('B','A')])
+        G2=lightnx.DiGraph()
+        G2.add_edges([('A','B'),('B','A'),('A','C')])
+        G3=lightnx.DiGraph()
+        G3.add_edges([('C','C')])
+        assert_equal(matchings.is_perfect_matchable(G1),True)
+        assert_equal(matchings.is_perfect_matchable(G2),False)
+        assert_equal(matchings.is_perfect_matchable(G3),True)
+
+
+
+#    def test_optimal_controller_set(self):
+        #G= lightnx.DiGraph()
+        #G.add_edges([(1,2),(2,1),(2,3),(3,4),(4,3),(5,4),(5,6),(6,5),(7,6),(7,7),(7,5)])
+        #matchings.optimal_controller_set(G)
+        #assert_equals(1,2)
+
+
 
     #def test_control_set_epinions(self):
         #import urllib,gzip,StringIO
