@@ -1,4 +1,4 @@
-import networkx as lightnx
+import digraph as lightnx
 from nose.tools import *
 import matchings
 
@@ -170,6 +170,31 @@ class TesterDigraph:
         assert_equals(set(gprime.nodes()),set([3,4,5,6]))
         assert_equals(set(gprime.predecessors(3)),set([4]))
         assert_equals(set(gprime.successors(3)),set([4]))
+
+    def test_is_assignable(self):
+        G= lightnx.DiGraph()
+        G.add_edges_from([(1,2),(2,1),(2,3),(3,4),(4,3),(5,4),(5,6),(6,5),(7,6),(7,7),(7,5)])
+        scc_pm_nt,Gprime = matchings.get_S_nt_rm_Gprime(G)
+        for scc in scc_pm_nt:
+            back_edges = Gprime.edges()[:]
+            msize = len(matchings.matching(Gprime))
+            assert_equals(False,
+                            matchings.is_assignable(scc, Gprime, msize))
+            assert_equals(back_edges, Gprime.edges())
+            assert_equals(hasattr(scc,'assignable_points'), False)
+        G.remove_edge(4,3) #This way component {1,2} becomes assignable through 3
+        scc_pm_nt,Gprime = matchings.get_S_nt_rm_Gprime(G)
+        for scc in scc_pm_nt:
+            back_edges = Gprime.edges()[:]
+            msize = len(matchings.matching(Gprime))
+            if len(scc.graph.nodes()) == 2:
+                assert_equals(True,
+                            matchings.is_assignable(scc, Gprime, msize))
+                assert_equals(scc.assignable_points, set([3]))
+            assert_equals(back_edges, Gprime.edges())
+
+
+
 
 
     #def test_control_set_epinions(self):

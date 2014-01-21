@@ -229,7 +229,6 @@ def controller_set(G):
             if not scc_controlled:
                 cont.add(str(scc[0]))
     return cont
-#def isAssignable(G,scc):
 
 class SCC():
     def __init__(self,subgraph):
@@ -242,30 +241,69 @@ class SCC():
             return True
         return False
 
+
 def get_S_nt_rm_Gprime(G):
     '''returns a list set of perfect matchable non top-linked strongly connected components of a graph
         returned objects of class "scc"
         returns also a subgraph o G' (the rest of the graph except for the S_nt_ru)
         Steps 1 and 2 in the paper
     '''
-    sccs=strongly_connected_components(G)
-    #non_top_linked=[]
-    perfect_matchable_nt=[]
-    nodesOnGPrime=Set(G.nodes())
+    sccs = strongly_connected_components(G)
+    perfect_matchable_nt = []
+    nodesOnGPrime = set(G.nodes())
     for scc in sccs:
-        if is_non_top_linked(G,scc):
+        if is_non_top_linked(G, scc):
             #non_top_linked.append(scc)
             sccnt = SCC(G.subgraph(scc))
             if is_perfect_matchable(sccnt.graph):
                 for node in scc:
                     nodesOnGPrime.remove(node)
-                    for outnode in G.successors(node): # NOT USING NEI!!! is not nx compliant
+                    for outnode in G.successors(node):
+                        # NOT USING NEI!!! is not nx compliant
                         if outnode not in sccnt:
                             sccnt.outnodes.add(outnode)
                             sccnt.outlinks.append((node, outnode))
                 perfect_matchable_nt.append(sccnt)
-    Gprime=G.subgraph(nodesOnGPrime)
+    Gprime = G.subgraph(nodesOnGPrime)
     return perfect_matchable_nt, Gprime
 
-#def optimal_set(G):
-#    s_nt_ru, gprime = get_pm_nt_scc_and_Gprime(G)
+
+def matching_with_driver(G, node):
+    cut_links = []
+        #keep a copy of removed links in memory to be readded afterwards
+    p = G.predecessors(node)
+    if hasattr(p, 'copy'):
+        pres = p.copy()
+    else:
+        pres = p[:]
+    for pre in pres:
+        cut_links.append((pre, node))
+        G.remove_edge(pre, node)
+    m = matching(G)
+    G.add_edges_from(cut_links)
+    return m
+
+
+def is_assignable(S, Gprime, msize):
+    #print "msize", msize
+    outnodes = S.outnodes
+    assignable = False
+    for outnode in outnodes:
+        m = matching_with_driver(Gprime, outnode)
+        if len(m) == msize:
+            assignable = True or assignable
+            if hasattr(S, 'assignable_points'):
+                S.assignable_points.add(outnode)
+            else:
+                S.assignable_points = set([outnode])
+    return assignable
+
+
+def optimal_control_set(G):
+    s_nt_rm, gprime = get_S_nt_rm_Gprime(G)
+    mgprime = matching(gprime)
+    assignables = []
+    for s in s_nt_rm:
+        if is_assignable(s, gprime, mgprime):
+            assignables += s
+
