@@ -147,6 +147,45 @@ class TesterDigraph:
         assert_equal(matchings.is_perfect_matchable(G1),True)
         assert_equal(matchings.is_perfect_matchable(G2),False)
         assert_equal(matchings.is_perfect_matchable(G3),True)
+    def test_is_assignable_std(self):
+        scenarios = []
+        scenarios.append([
+            [(1, 2), (2, 1), (2, 3), (4, 3), (5, 4), (5, 6), (6, 5), (7, 6), (7, 7), (7, 5)],
+            [[7]],
+            [[6]]
+        ])
+        scenarios.append([
+            [(1, 2), (2, 1), (2, 3), (3, 4), (5, 4), (5, 6), (6, 5), (7, 6), (7, 7), (7, 5)],
+            [[1, 2]],
+            [[3]]
+        ])
+        scenarios.append([
+            [(1, 2), (2, 1), (2, 3), (5, 3), (5, 6), (6, 5), (7, 6), (7, 7), (7, 5)],
+            [[1, 2], [7]],
+            [[3], [6]]
+        ])
+        for scenario in scenarios:
+            #print scenario[0]
+            G = lightnx.DiGraph()
+            G.add_edges_from(scenario[0])
+            scc_pm_nt, Gprime = matchings.get_S_nt_rm_Gprime(G)
+            assignable_sorted = map(sorted, scenario[1])
+            msize = len(matchings.matching(Gprime))
+            assign = []
+            for scc in scc_pm_nt:
+                #print "scc",scc.graph.nodes()
+                back_edges = Gprime.edges()[:]
+                if matchings.is_assignable(scc, Gprime, msize):
+                    assign.append(scc)
+                    #print "asig"
+                    try:
+                        idx = assignable_sorted.index(sorted(scc.graph.nodes()))
+                    except:
+                        idx = None
+                    assert_equals(sorted(back_edges) ,sorted(Gprime.edges()))
+                    assert_equals(idx is None, False)
+                    assert_equals(scc.assignable_points, set(scenario[2][idx]))
+            assert_equals(len(assign),len(assignable_sorted))
 
 
 
