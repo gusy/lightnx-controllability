@@ -269,21 +269,7 @@ def get_S_nt_rm_Gprime(G):
 
 
 def matching_with_driver(G, node):
-    cut_links = []
-        #keep a copy of removed links in memory to be readded afterwards
-    p = G.predecessors(node)
-    if hasattr(p, 'copy'):
-        pres = p.copy()
-    else:
-        pres = p[:]
-    for pre in pres:
-        cut_links.append((pre, node))
-        G.remove_edge(pre, node)
-    m = matching(G)
-    G.add_edges_from(cut_links)
-    return m
-
-
+    return matching_with_drivers(G, [node])
 
 def matching_with_drivers(G, nodes):
     cut_links = []
@@ -370,10 +356,13 @@ def optimum_controller_set(G):
     for scc in s_nt_rm:
         if (is_assignable(scc, Gprime, mSize)):
             assignables.append(scc)
-    if len(assignables) > 0:
+    compatibles = []
+    if len(assignables) == 1:
+        compatibles = assignables
+    elif len(assignables) > 1:
         compatibles = [assignables[0]]
         for scc in assignables[1:]:
             if isCompatible(compatibles, scc, Gprime, mSize):
                 compatibles.append(scc)
-    print compatibles, s_nt_rm, Gprime
-    return len(Gprime.nodes())-mSize+len(s_nt_rm)-len(compatibles)
+    return len(Gprime.nodes()) - mSize + len(s_nt_rm) - len(compatibles)
+
