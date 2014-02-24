@@ -2,7 +2,7 @@ from digraph import DiGraph
 import collections
 import random
 from sets import Set
-
+import itertools
 INFINITY = -1
 
 def getBipartite(G):
@@ -284,6 +284,24 @@ def matching_with_driver(G, node):
     return m
 
 
+
+def matching_with_drivers(G, nodes):
+    cut_links = []
+    #keep a copy of removed links in memory to be readded afterwards
+    for node in nodes:
+        p = G.predecessors(node)
+        if hasattr(p, 'copy'):
+            pres = p.copy()
+        else:
+            pres = p[:]
+        for pre in pres:
+            cut_links.append((pre, node))
+            G.remove_edge(pre, node)
+    m = matching(G)
+    G.add_edges_from(cut_links)
+    return m
+
+
 def is_assignable(S, Gprime, msize):
     #print "msize", msize
     outnodes = S.outnodes
@@ -291,7 +309,7 @@ def is_assignable(S, Gprime, msize):
     for outnode in outnodes:
         m = matching_with_driver(Gprime, outnode)
         if len(m) == msize:
-            assignable = True or assignable
+            assignable = True
             if hasattr(S, 'assignable_points'):
                 S.assignable_points.add(outnode)
             else:
@@ -299,11 +317,63 @@ def is_assignable(S, Gprime, msize):
     return assignable
 
 
-def optimal_control_set(G):
-    s_nt_rm, gprime = get_S_nt_rm_Gprime(G)
-    mgprime = matching(gprime)
-    assignables = []
-    for s in s_nt_rm:
-        if is_assignable(s, gprime, mgprime):
-            assignables += s
+def is_pairWiseCompatible(S1, S2, Gprime, msize):
+    outnodes_scc1 = S1.outnodes
+    outnodes_scc2 = S2.outnodes
+    compatible = False
+    for outnode1 in outnodes_scc1:
+        for outnode2 in outnodes_scc2:
+            #print outnode1, outnode2
+            if outnode1 == outnode2:
+                continue
+            m = matching_with_drivers(Gprime, [outnode1, outnode2])
+            if len(m) == msize:
+                compatible = True
+                break
+        if (compatible):
+            break
+    return compatible
 
+
+def sets_combinations(set_list):
+    combinations = [[i] for i in set_list[0]]
+    for set_i in set_list[1:]:
+        tempcomb = []
+        for i in set(set_i):
+            tempcomb += [c + [i] for c in combinations if i not in c]
+        combinations = tempcomb
+    return combinations
+
+
+def isCompatible(compatibleSCCs, S_assignable, Gprime, msize):
+    outnodes_sccs = {}
+    outnodes_sccs[0] = S_assignable.outnodes
+    scc_index = 1
+    compatible = False
+    for scc in compatibleSCCs:
+        outnodes_sccs[scc_index] = scc.outnodes
+        scc_index += 1
+    posible_out_configs = sets_combinations(outnodes_sccs.values())
+    for out_config in posible_out_configs:
+        match_c = matching_with_drivers(Gprime, out_config)
+        #print match_c, out_config
+        if len(match_c) == msize:
+            compatible = True
+            break
+    return compatible
+
+
+def optimum_controller_set(G):
+    s_nt_rm, Gprime = get_S_nt_rm_Gprime(G)
+    assignables = []
+    mSize = len(matching(Gprime))
+    for scc in s_nt_rm:
+        if (is_assignable(scc, Gprime, mSize)):
+            assignables.append(scc)
+    if len(assignables) > 0:
+        compatibles = [assignables[0]]
+        for scc in assignables[1:]:
+            if isCompatible(compatibles, scc, Gprime, mSize):
+                compatibles.append(scc)
+    print compatibles, s_nt_rm, Gprime
+    return len(Gprime.nodes())-mSize+len(s_nt_rm)-len(compatibles)

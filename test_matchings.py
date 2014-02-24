@@ -148,8 +148,6 @@ class TesterDigraph:
         assert_equal(matchings.is_perfect_matchable(G2),False)
         assert_equal(matchings.is_perfect_matchable(G3),True)
 
-
-
     def test_get_S_nt_rm_Gprime(self):
         G= lightnx.DiGraph()
         G.add_edges_from([(1,2),(2,1),(2,3),(3,4),(4,3),(5,4),(5,6),(6,5),(7,6),(7,7),(7,5)])
@@ -210,6 +208,61 @@ class TesterDigraph:
                     assert_equals(idx is None, False)
                     assert_equals(scc.assignable_points, set(scenario[2][idx]))
             assert_equals(len(assign),len(assignable_sorted))
+    def test_is_compatible(self):
+        scenarios = []
+        scenarios.append([
+            [(1, 2), (2, 1), (2, 3), (3, 4), (4, 3), (5, 4), (5, 6), (6, 5), (3, 7), (4, 7)],
+            [[7]],
+            [[6]]
+        ])
+        for scenario in scenarios:
+            G=lightnx.DiGraph()
+            G.add_edges_from(scenario[0])
+            scc_pm_nt, Gprime = matchings.get_S_nt_rm_Gprime(G)
+            assignable_sorted = map(sorted, scenario[1])
+            msize = len(matchings.matching(Gprime))
+            assign = []
+            for scc in scc_pm_nt:
+                if matchings.is_assignable(scc, Gprime, msize):
+                    assign.append(scc)
+            compatibles=[assign[0]]
+            print assign[0].outnodes
+            for scc in assign[1:]:
+                print scc.outnodes
+                compatible= matchings.isCompatible(compatibles,scc,Gprime,msize)
+                print compatible
+        assert_equals(1,2)
+    def test_optimum_controller_set(self):
+        scenarios = []
+        scenarios.append([
+            [(1, 2), (2, 1), (2, 3), (3, 4), (4, 3), (5, 4), (5, 6), (6, 5), (3, 7), (4, 7)],
+            [[7]],
+            [[6]]
+        ])
+        for scenario in scenarios:
+            G=lightnx.DiGraph()
+            G.add_edges_from(scenario[0])
+            optimum_controller_set=matchings.optimum_controller_set(G)
+            assert_equals(1,3)
+            '''scc_pm_nt, Gprime = matchings.get_S_nt_rm_Gprime(G)
+            assignable_sorted = map(sorted, scenario[1])
+            msize = len(matchings.matching(Gprime))
+            assign = []
+            for scc in scc_pm_nt:
+                if matchings.is_assignable(scc, Gprime, msize):
+                    assign.append(scc)
+            compatibles=[assign[0]]
+            print assign[0].outnodes
+            for scc in assign[1:]:
+                print scc.outnodes
+                compatible= matchings.isCompatible(compatibles,scc,Gprime,msize)
+                print compatible
+        assert_equals(1,2)'''
+
+
+
+
+
 
 
 
