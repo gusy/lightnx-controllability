@@ -188,8 +188,27 @@ class TesterDigraph:
             [[1, 2], [7]],
             [[3], [6]]
         ])
+        #2nd batch
+        scenarios.append([
+              [(1,2),(2,1),(3,3),(2,4),(3,4),(3,5)],
+              [[1,2],[3]],
+              [[4],[4,5]]
+        ])
+
+        scenarios.append([
+              [(1,2),(2,1),(3,3),(2,4),(3,4),(3,5),(5,4)],
+              [[1,2],[3]],
+              [[4],[5]]
+        ])
+
+        scenarios.append([
+              [(1,2),(2,1),(1,3),(2,4),(3,4),(4,3),(6,6),(6,3)],
+              [[1,2],[6]],
+              [[3,4],[3]]
+        ])
+
         for scenario in scenarios:
-            #print scenario[0]
+            print scenario[0]
             G = lightnx.DiGraph()
             G.add_edges_from(scenario[0])
             scc_pm_nt, Gprime = matchings.get_S_nt_rm_Gprime(G)
@@ -197,7 +216,6 @@ class TesterDigraph:
             msize = len(matchings.matching(Gprime))
             assign = []
             for scc in scc_pm_nt:
-                #print "scc",scc.graph.nodes()
                 back_edges = Gprime.edges()[:]
                 if matchings.is_assignable(scc, Gprime, msize):
                     assign.append(scc)
