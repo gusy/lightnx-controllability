@@ -264,7 +264,18 @@ class TesterDigraph:
                 if 3 == el[1] or 5 == el[1]:
                     assert_equals(True, False)
 
-
+    def test_sets_combinations(self):
+        a = set([4, 5, 6, 9])
+        b = set([1, 2, 3])
+        com = matchings.sets_combinations([a, b])
+        assert_equals(len(com), len(a) * len(b))
+        a = set([4, 5, 6, 9])
+        b = set([4, 5])
+        com = matchings.sets_combinations([a, b])
+        print com
+        assert_equals(len(com) < (len(a) * len(b)), True)
+        assert_equals([4, 4] in com, False)
+        assert_equals([4, 5] in com, True)
 
 
 
