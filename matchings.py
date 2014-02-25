@@ -303,23 +303,6 @@ def is_assignable(S, Gprime, msize):
     return assignable
 
 
-def is_pairWiseCompatible(S1, S2, Gprime, msize):
-    outnodes_scc1 = S1.outnodes
-    outnodes_scc2 = S2.outnodes
-    compatible = False
-    for outnode1 in outnodes_scc1:
-        for outnode2 in outnodes_scc2:
-            #print outnode1, outnode2
-            if outnode1 == outnode2:
-                continue
-            m = matching_with_drivers(Gprime, [outnode1, outnode2])
-            if len(m) == msize:
-                compatible = True
-                break
-        if (compatible):
-            break
-    return compatible
-
 
 def sets_combinations(set_list):
     combinations = [[i] for i in set_list[0]]
