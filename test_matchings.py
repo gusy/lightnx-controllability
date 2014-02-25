@@ -237,7 +237,7 @@ class TesterDigraph:
              (5, 6), (6, 5), (7, 6), (7, 7), (7, 5)]
         )
         for scenario in scenarios:
-            print scenario[0]
+            print scenario
             G = lightnx.DiGraph()
             G.add_edges_from(scenario)
             m = matchings.matching_with_driver(G, 3)
@@ -245,6 +245,27 @@ class TesterDigraph:
             for el in m:
                 if 3 == el[1]:
                     assert_equals(True, False)
+        for scenario in scenarios:
+            print scenario
+            G = lightnx.DiGraph()
+            G.add_edges_from(scenario)
+            m = matchings.matching_with_drivers(G, [3])
+            assert_equals(len(m), 5)
+            for el in m:
+                if 3 == el[1]:
+                    assert_equals(True, False)
+        for scenario in scenarios:
+            print scenario
+            G = lightnx.DiGraph()
+            G.add_edges_from(scenario)
+            m = matchings.matching_with_drivers(G, [3, 5])
+            assert_equals(len(m), 4)
+            for el in m:
+                if 3 == el[1] or 5 == el[1]:
+                    assert_equals(True, False)
+
+
+
 
 
 
