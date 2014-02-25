@@ -147,47 +147,6 @@ class TesterDigraph:
         assert_equal(matchings.is_perfect_matchable(G1),True)
         assert_equal(matchings.is_perfect_matchable(G2),False)
         assert_equal(matchings.is_perfect_matchable(G3),True)
-    def test_is_assignable_std(self):
-        scenarios = []
-        scenarios.append([
-            [(1, 2), (2, 1), (2, 3), (4, 3), (5, 4), (5, 6), (6, 5), (7, 6), (7, 7), (7, 5)],
-            [[7]],
-            [[6]]
-        ])
-        scenarios.append([
-            [(1, 2), (2, 1), (2, 3), (3, 4), (5, 4), (5, 6), (6, 5), (7, 6), (7, 7), (7, 5)],
-            [[1, 2]],
-            [[3]]
-        ])
-        scenarios.append([
-            [(1, 2), (2, 1), (2, 3), (5, 3), (5, 6), (6, 5), (7, 6), (7, 7), (7, 5)],
-            [[1, 2], [7]],
-            [[3], [6]]
-        ])
-        for scenario in scenarios:
-            #print scenario[0]
-            G = lightnx.DiGraph()
-            G.add_edges_from(scenario[0])
-            scc_pm_nt, Gprime = matchings.get_S_nt_rm_Gprime(G)
-            assignable_sorted = map(sorted, scenario[1])
-            msize = len(matchings.matching(Gprime))
-            assign = []
-            for scc in scc_pm_nt:
-                #print "scc",scc.graph.nodes()
-                back_edges = Gprime.edges()[:]
-                if matchings.is_assignable(scc, Gprime, msize):
-                    assign.append(scc)
-                    #print "asig"
-                    try:
-                        idx = assignable_sorted.index(sorted(scc.graph.nodes()))
-                    except:
-                        idx = None
-                    assert_equals(sorted(back_edges) ,sorted(Gprime.edges()))
-                    assert_equals(idx is None, False)
-                    assert_equals(scc.assignable_points, set(scenario[2][idx]))
-            assert_equals(len(assign),len(assignable_sorted))
-
-
 
     def test_get_S_nt_rm_Gprime(self):
         G= lightnx.DiGraph()
@@ -211,27 +170,222 @@ class TesterDigraph:
         assert_equals(set(gprime.successors(3)),set([4]))
 
 
+
+
     def test_is_assignable_std(self):
-        scenario = [
+        scenarios = []
+        scenarios.append([
             [(1, 2), (2, 1), (2, 3), (4, 3), (5, 4), (5, 6), (6, 5), (7, 6), (7, 7), (7, 5)],
-            [[2, 1], [7]],
+            [[7]],
+            [[6]]
+        ])
+        scenarios.append([
+            [(1, 2), (2, 1), (2, 3), (3, 4), (5, 4), (5, 6), (6, 5), (7, 6), (7, 7), (7, 5)],
+            [[1, 2]],
+            [[3]]
+        ])
+        scenarios.append([
+            [(1, 2), (2, 1), (2, 3), (5, 3), (5, 6), (6, 5), (7, 6), (7, 7), (7, 5)],
+            [[1, 2], [7]],
             [[3], [6]]
-        ]
-        G = lightnx.DiGraph()
-        G.add_edges_from(scenario[0])
-        scc_pm_nt, Gprime = matchings.get_S_nt_rm_Gprime(G)
-        assignable_sorted = map(sorted, scenario[1])
-        msize = len(matchings.matching(Gprime))
-        for scc in scc_pm_nt:
-            back_edges = Gprime.edges()[:]
-            if matchings.is_assignable(scc, Gprime, msize):
-                try:
-                    idx = assignable_sorted.index(sorted(scc.graph.nodes()))
-                except:
-                    idx = None
-                aseert_equals = (sorted(back_edges) ,sorted(Gprime.edges()))
-                assert_equals(idx is None, False)
-                assert_equals(scc.assignable_points, set(scenario[2][idx]))
+        ])
+        #2nd batch
+        scenarios.append([
+              [(1,2),(2,1),(3,3),(2,4),(3,4),(3,5)],
+              [[1,2],[3]],
+              [[4],[4,5]]
+        ])
+
+        scenarios.append([
+              [(1,2),(2,1),(3,3),(2,4),(3,4),(3,5),(5,4)],
+              [[3]],
+              [[5]]
+        ])
+
+        scenarios.append([
+              [(1,2),(2,1),(1,3),(2,4),(3,4),(4,3),(6,6),(6,3)],
+              [],
+              []
+        ])
+
+        for scenario in scenarios:
+            print scenario[0]
+            G = lightnx.DiGraph()
+            G.add_edges_from(scenario[0])
+            scc_pm_nt, Gprime = matchings.get_S_nt_rm_Gprime(G)
+            assignable_sorted = map(sorted, scenario[1])
+            msize = len(matchings.matching(Gprime))
+            assign = []
+            for scc in scc_pm_nt:
+                back_edges = Gprime.edges()[:]
+                if matchings.is_assignable(scc, Gprime, msize):
+                    assign.append(scc)
+                    #print "asig"
+                    try:
+                        idx = assignable_sorted.index(sorted(scc.graph.nodes()))
+                    except:
+                        idx = None
+                    assert_equals(sorted(back_edges) ,sorted(Gprime.edges()))
+                    assert_equals(idx is None, False)
+                    assert_equals(scc.assignable_points, set(scenario[2][idx]))
+            assert_equals(len(assign),len(assignable_sorted))
+
+    def test_matching_with_drivers(self):
+        scenarios = []
+        scenarios.append(
+            [(1, 2), (2, 1), (2, 3), (4, 3), (5, 4),
+             (5, 6), (6, 5), (7, 6), (7, 7), (7, 5)]
+        )
+        for scenario in scenarios:
+            print scenario
+            G = lightnx.DiGraph()
+            G.add_edges_from(scenario)
+            m = matchings.matching_with_driver(G, 3)
+            assert_equals(len(m), 5)
+            for el in m:
+                if 3 == el[1]:
+                    assert_equals(True, False)
+        for scenario in scenarios:
+            print scenario
+            G = lightnx.DiGraph()
+            G.add_edges_from(scenario)
+            m = matchings.matching_with_drivers(G, [3])
+            assert_equals(len(m), 5)
+            for el in m:
+                if 3 == el[1]:
+                    assert_equals(True, False)
+        for scenario in scenarios:
+            print scenario
+            G = lightnx.DiGraph()
+            G.add_edges_from(scenario)
+            m = matchings.matching_with_drivers(G, [3, 5])
+            assert_equals(len(m), 4)
+            for el in m:
+                if 3 == el[1] or 5 == el[1]:
+                    assert_equals(True, False)
+
+    def test_sets_combinations(self):
+        a = set([4, 5, 6, 9])
+        b = set([1, 2, 3])
+        com = matchings.sets_combinations([a, b])
+        assert_equals(len(com), len(a) * len(b))
+        a = set([4, 5, 6, 9])
+        b = set([4, 5])
+        com = matchings.sets_combinations([a, b])
+        print com
+        assert_equals(len(com) < (len(a) * len(b)), True)
+        assert_equals([4, 4] in com, False)
+        assert_equals([4, 5] in com, True)
+
+    def test_is_compatible(self):
+        scenarios = []
+        scenarios.append([
+            [(1, 2), (2, 1), (2, 3), (3, 4), (4, 3), (5, 4), (5, 6), (6, 5), (3, 7), (4, 7)],
+            [[1, 2]],
+            [5, 6],
+            False
+        ])
+        scenarios.append([
+            [(1, 2), (2, 1), (2, 3), (3, 4), (4, 3), (5, 4), (5, 6), (6, 5), (3, 7), (4, 7), (3, 8), (4, 8)],
+            [[1, 2]],
+            [5, 6],
+            True
+        ])
+        scenarios.append([
+            [(1, 2), (2, 1), (2, 3), (3, 4), (4, 3), (5, 4), (5, 6), (6, 5), (3, 7), (4, 7), (3, 8) ],
+            [[1, 2]],
+            [5, 6],
+            True
+        ])
+        scenarios.append([
+            [(1, 2), (2, 1), (2, 3), (3, 4), (4, 3), (5, 4), (5, 6), (6, 5), (3, 7), (4, 8) ],
+            [[1, 2]],
+            [5, 6],
+            True
+        ])
+        scenarios.append([
+            [(1, 2), (2, 1), (2, 3), (3, 4), (4, 3), (5, 4), (5, 6), (6, 5), (3, 7), (4, 8), (10, 9), (9, 10), (9, 3), (9, 4) ],
+            [[9, 10]],
+            [5, 6],
+            True
+        ])
+        scenarios.append([
+            [(1, 2), (2, 1), (2, 3), (3, 4), (4, 3), (5, 4), (5, 6), (6, 5), (3, 7), (4, 8), (10, 9), (9, 10), (9, 3), (9, 4) ],
+            [[1, 2]],
+            [9, 10],
+            True
+        ])
+        scenarios.append([
+            [(1, 2), (2, 1), (2, 3), (3, 4), (4, 3), (5, 4), (5, 6), (6, 5), (3, 7), (4, 8), (10, 9), (9, 10), (9, 3), (9, 4) ],
+            [[1, 2]],
+            [5, 6],
+            True
+        ])
+        scenarios.append([
+            [(1, 2), (2, 1), (2, 3), (3, 4), (4, 3), (5, 4), (5, 6), (6, 5), (3, 7), (4, 8), (10, 9), (9, 10), (9, 3), (9, 4) ],
+            [[1, 2], [6, 5]],
+            [10, 9],
+            False
+        ])
+        for scenario in scenarios:
+            print 30 * "="
+            print scenario[0]
+            G = lightnx.DiGraph()
+            G.add_edges_from(scenario[0])
+            scc_pm_nt, Gprime = matchings.get_S_nt_rm_Gprime(G)
+            msize = len(matchings.matching(Gprime))
+            assign = []
+            for scc in scc_pm_nt:
+                if matchings.is_assignable(scc, Gprime, msize):
+                    assign.append(scc)
+            compatibles = []
+            scc_test = None
+            for scc in assign:
+                if sorted(scc.graph.nodes()) in map(sorted,scenario[1]):
+                    compatibles.append(scc)
+                if sorted(scc.graph.nodes()) == sorted(scenario[2]):
+                    scc_test = scc
+            print [com.graph.nodes() for com in compatibles]
+            print scc.graph.nodes()
+            assert_equals(len(scenario[1]), len(compatibles))
+            assert_equals(scc_test == None, False)
+            compatible = matchings.isCompatible(compatibles,
+                                                    scc_test, Gprime, msize)
+            print compatible
+            assert_equals(compatible, scenario[3])
+
+    #def test_optimum_controller_set(self):
+        #scenarios = []
+        #scenarios.append([
+            #[(1, 2), (2, 1), (2, 3), (3, 4), (4, 3), (5, 4), (5, 6), (6, 5), (3, 7), (4, 7)],
+            #[[7]],
+            #[[6]]
+        #])
+        #for scenario in scenarios:
+            #G=lightnx.DiGraph()
+            #G.add_edges_from(scenario[0])
+            #optimum_controller_set=matchings.optimum_controller_set(G)
+            #assert_equals(1,3)
+            #'''scc_pm_nt, Gprime = matchings.get_S_nt_rm_Gprime(G)
+            #assignable_sorted = map(sorted, scenario[1])
+            #msize = len(matchings.matching(Gprime))
+            #assign = []
+            #for scc in scc_pm_nt:
+                #if matchings.is_assignable(scc, Gprime, msize):
+                    #assign.append(scc)
+            #compatibles=[assign[0]]
+            #print assign[0].outnodes
+            #for scc in assign[1:]:
+                #print scc.outnodes
+                #compatible= matchings.isCompatible(compatibles,scc,Gprime,msize)
+                #print compatible
+        #assert_equals(1,2)'''
+
+
+
+
+
+
 
 
 
