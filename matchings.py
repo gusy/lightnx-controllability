@@ -307,10 +307,12 @@ def is_assignable(S, Gprime, msize):
 def sets_combinations(set_list):
     combinations = [[i] for i in set_list[0]]
     for set_i in set_list[1:]:
+        print set_i
         tempcomb = []
         for i in set(set_i):
             tempcomb += [c + [i] for c in combinations if i not in c]
-        combinations = tempcomb
+        if tempcomb:
+            combinations = tempcomb
     return combinations
 
 
@@ -322,30 +324,40 @@ def isCompatible(compatibleSCCs, S_assignable, Gprime, msize):
     for scc in compatibleSCCs:
         outnodes_sccs[scc_index] = scc.outnodes
         scc_index += 1
+    print outnodes_sccs.values()
     posible_out_configs = sets_combinations(outnodes_sccs.values())
     for out_config in posible_out_configs:
-        match_c = matching_with_drivers(Gprime, out_config)
-        #print match_c, out_config
-        if len(match_c) == msize:
-            compatible = True
-            break
-    return compatible
+        if len(out_config) == (len(compatibleSCCs)+1):
+            match_c = matching_with_drivers(Gprime, out_config)
+            #print match_c, out_config
+            if len(match_c) == msize:
+                compatible = True
+                break
+    print compatible
+    print posible_out_configs
+    if compatible:
+        compatibleSCCs.insert(0, S_assignable)
+        print "sccs compatibles"
+        for i in xrange(0, len(compatibleSCCs)):
+            print compatibleSCCs[i].graph.nodes(),
+            compatibleSCCs[i].comp_node = out_config[i]
+    return compatible, compatibleSCCs
 
 
-def optimum_controller_set(G):
-    s_nt_rm, Gprime = get_S_nt_rm_Gprime(G)
-    assignables = []
-    mSize = len(matching(Gprime))
-    for scc in s_nt_rm:
-        if (is_assignable(scc, Gprime, mSize)):
-            assignables.append(scc)
-    compatibles = []
-    if len(assignables) == 1:
-        compatibles = assignables
-    elif len(assignables) > 1:
-        compatibles = [assignables[0]]
-        for scc in assignables[1:]:
-            if isCompatible(compatibles, scc, Gprime, mSize):
-                compatibles.append(scc)
-    return len(Gprime.nodes()) - mSize + len(s_nt_rm) - len(compatibles)
+#def optimum_controller_set(G):
+    #s_nt_rm, Gprime = get_S_nt_rm_Gprime(G)
+    #assignables = []
+    #mSize = len(matching(Gprime))
+    #for scc in s_nt_rm:
+        #if (is_assignable(scc, Gprime, mSize)):
+            #assignables.append(scc)
+    #compatibles = []
+    #if len(assignables) == 1:
+        #compatibles = assignables
+    #elif len(assignables) > 1:
+        #compatibles = [assignables[0]]
+        #for scc in assignables[1:]:
+            #if isCompatible(compatibles, scc, Gprime, mSize):
+                #compatibles.append(scc)
+    #return len(Gprime.nodes()) - mSize + len(s_nt_rm) - len(compatibles)
 

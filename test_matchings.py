@@ -265,6 +265,11 @@ class TesterDigraph:
                     assert_equals(True, False)
 
     def test_sets_combinations(self):
+        a = set([3, 4])
+        b = set([3])
+        c = set([4])
+        com = matchings.sets_combinations([a, b, c])
+        assert_equals(len(com),1)
         a = set([4, 5, 6, 9])
         b = set([1, 2, 3])
         com = matchings.sets_combinations([a, b])
@@ -349,10 +354,17 @@ class TesterDigraph:
             print scc.graph.nodes()
             assert_equals(len(scenario[1]), len(compatibles))
             assert_equals(scc_test == None, False)
-            compatible = matchings.isCompatible(compatibles,
+            compatible, compatibleSCCs = matchings.isCompatible(compatibles,
                                                     scc_test, Gprime, msize)
             print compatible
             assert_equals(compatible, scenario[3])
+            if compatible:
+                outnodes = [scc.comp_node for scc in compatibleSCCs]
+                assert_equals(len(outnodes), len(set(outnodes)))
+                for scc in compatibleSCCs:
+                    print scc.comp_node, scc.graph.nodes()
+                #assert_equals(scc.comp_node in scc.graph.nodes(), True)
+
 
     #def test_optimum_controller_set(self):
         #scenarios = []
